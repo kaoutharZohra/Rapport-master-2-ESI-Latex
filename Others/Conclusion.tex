@@ -1,0 +1,22 @@
+% Chapter Template
+\chapter*{Conclusion générale et perspectives}% Main chapter title
+\addtotoc{Conclusion générale}
+\label{Chapter14} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
+
+\lhead{\emph{Conclusion générale et perspective}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
+%\begin{tabbing}
+\section{Conclusion}
+\tab L'objectif initial de ce travail était de concevoir et de réaliser une détection de personnes et une navigation sociale pour un robot guide. La détection de personnes exploite le capteur de vision Kinect et le capteur laser. Elle est utilisée pour une navigation sociale qui respecte un ensemble de conventions lors du guidage de la personne.\vspace{5px}\\
+\tab Avant de répondre à cet objectif, nous avons consacré toute une partie pour présenter le domaine de la robotique, particulièrement la robotique sociale, et celui de la détection de personnes ainsi que les différentes approches et méthodes existantes qui avaient comme objectif d'assurer la détection de personnes par un robot mobile et la navigation sociale de ce dernier dans les environnements peuplés.\vspace{5px}\\
+\tab Pour répondre à la première partie de notre problématique, celle de la détection de personnes, nous avons proposé un module qui exploite un algorithme de détection de visage, un autre de squelettes et deux autres algorithmes pour la détection des jambes. Les deux premiers algorithmes (le détecteur de visage et de squelettes) utilisent les données retournées par la caméra Kinect dans leurs détections tandis que les deux autres modules (les détecteurs de jambes) travaillant sur les données fournies par le capteur laser. Pour améliorer les résultats des algorithmes de ce module, nous avons inclus la fiabilité des détections pour diminuer le taux de fausses détections présent. Nous avons aussi exploité la carte de l'environnement qui nous offre des informations sur les obstacles statiques avec laquelle nous pouvons réduire encore le taux des fausses détections.\vspace{5px}\\
+\tab Pour répondre à la deuxième partie de notre problématique, nous avons mis en œuvre un module de navigation sociale qui répond à un ensemble d'exigences sociales en se basant sur le partage l'espace social autour de l'homme. Un module qui situe la personne dans l'espace et selon son emplacement et sa vitesse choisit la décision à prendre.\vspace{5px}\\
+\tab Pour tester les performances et le bon fonctionnement des modules, nous avons procédé à des tests en simulation que nous avons validé ensuite sur la plate-forme réelle. Les résultats prouvent que notre système répond aux objectifs cités au début.
+
+\section{Perspectives}
+
+\tab Tout système étant appelé à évoluer, des améliorations peuvent être apportées à notre système afin de le rendre plus performant en titre de nature de résultats obtenus.\vspace{5px}\\
+\tab Commençons par le module de détection que nous pouvons encore améliorer pour diminuer ou même éviter toutes les fausses détections présentes dans l'environnement. On pourrait penser à enrichir les deux modules de détection de jambes par d'autres modèles de jambes à ajouter et même le module de détection de visage qui pourra prendre en compte d'autres formes de visages non très bien claires.\vspace{5px}\\
+\tab Pour le module de navigation sociale, il sera intéressant de lui inclure encore des commandes vocales pour assurer une souple interaction avec l'homme.\vspace{5px}\\
+\tab Le service du guidage peut ne pas être destiné seulement à une seule personne, mais il peut être utilisé par plusieurs. Nous pensons à enrichir le module du guidage de telle sorte à pouvoir guider un groupe de personnes vers une destination précise. Cette extension du module de détection nous oriente vers une nouvelle piste de travail (la détection des groupes de personnes). La détection de groupe de personnes va s'appuyer sur le module de détection d'une seule personne. En appliquant un ensemble de règles spatiales sur l'ensemble des personnes, les groupes pourront être détectés. Cette détection est liée fortement à celle d'une seule personne, ce qui nécessite une très bonne détection initiale.
+
+

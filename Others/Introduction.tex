@@ -1,0 +1,38 @@
+% Chapter Template
+\chapter*{Introduction}% Main chapter title
+\addtotoc{Introduction}
+\label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
+
+\lhead{\emph{Introduction}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
+%\begin{tabbing}
+\tab La robotique mobile est devenue dans ces dernières décennies une branche de recherche très intéressante et très répondue dans presque tous les domaines. Elle s'inclut dans la vie quotidienne de l'homme en assurant différentes tâches et en lui offrant divers services.\vspace{5px}\\
+\tab La robotique mobile et sociale n'est jamais utilisée seule, elle coopère avec plusieurs autres domaines. Pour pouvoir accomplir un service, le robot doit prendre conscience de l'environnement qui l'entoure. Pour répondre à ce besoin, le domaine de la perception et de la détection d'objets se présente. Comme la tendance de la robotique mobile actuelle est la robotique de service et sociale, les robots se retrouvent dans des environnements humains avec lesquels ils doivent interagir et gérer leurs comportements d'une manière socialement acceptable par l'homme.\vspace{5px}\\
+\tab Pour répondre à une des problématiques de la robotique sociale qui est bien celle du guidage d'une personne dans un environnement peuplé, le Centre de Développement des Technologies Avancées propose un projet d'un robot guide intelligent et interactif (le projet RG2I) mené par l'équipe NCRM (Navigation et Contrôle des Robots Mobiles Autonomes).\vspace{5px} \\
+\tab Le projet consiste à développer un système contrôlant un robot guide qui prend en charge l'aspect social des personnes se trouvant dans son environnement. Le sous projet dans lequel nous sommes incluses consiste premièrement à améliorer la détection des personnes par le robot B21r équipé de plusieurs capteurs particulièrement le capteur de vison Kinect et le capteur laser. Dans une seconde partie, nous exploitons cette détection pour assurer la fonctionnalité de guidage d'une personne à une destination précise tout en respectant un ensemble de conventions sociales. Ces conventions gèrent le comportement du robot selon celui de la personne guidée.\vspace{5px}\\
+\tab Plusieurs chercheurs se sont penchés sur le problème de détection de personnes par des capteurs de vison et des capteurs laser, et un tas de méthodes ont été proposées pour répondre à cette question. Plusieurs autres études ont cerné la problématique de navigation sociale des robots mobiles en s'inspirant principalement d'une multitude d'études faites en sociologie.\vspace{5px}\\
+\tab En se basant sur quelques-une de ces méthodes, nous construisons notre solution qui vise à atteindre les objectifs suivants :\vspace{5px} 
+\begin{itemize}
+	\item Améliorer le module de détection de personnes en réduisant le taux des fausses détections du système actuel et en élargissant le champ de détection ;
+	\item Concevoir un module qui gère le comportement du robot durant le guidage, selon celui de la personne guidée.\vspace{5px}\\ 
+\end{itemize}
+\tab Nous structurons ce présent rapport en trois parties, la première inclut deux chapitres dans lesquels nous présentons les notions fondamentales de la robotique plus particulièrement la robotique sociale et aussi la détection de personnes et une synthèse bibliographique sur la détection et la navigation sociale. La deuxième partie est consacrée à la présentation du projet, l'analyse des besoins et la conception de notre solution proposée. Alors que la troisième partie est réservée à la mise en œuvre de notre solution, les résultats et les différents tests réalisés sur le système final.\vspace{5px}\\
+{\Large \textbf{La partie 1: Synthèse bibliographique}}\vspace{5px}\\
+\tab Cette partie compte deux chapitres introductifs sur la détection de personnes et la navigation sociale.\vspace{5px}\\
+\textbf{Chapitre 1 : Détection de personnes par un robot mobile} \vspace{5px}\\
+\tab Dans ce chapitre, nous introduisons quelques notions fondamentales de la robotique et de la détection de personnes par un robot mobile. Nous citons les principales méthodes et approches de la détection de personnes par des capteurs vision et d'autres par le capteur laser. Nous passerons en revue les approches de détection de la totalité du corps ou de parties du corps par un capteur de vision ainsi que les différentes approches de détection de personnes par un laser (la comparaison des mesures consécutives, la reconnaissance des caractéristiques géométriques et de la posture, et les méthodes par apprentissage).\vspace{5px}\\
+\textbf{Chapitre 2 : La navigation sociale d’un robot mobile}\vspace{5px}\\
+\tab Ce chapitre introduit la robotique et la navigation sociale. Il comporte une panoplie de méthodes et d'approches de la navigation sociale passant par la théorie de proxémie, l'analyse du comportement, les méthodes de calcul de coûts, etc.\vspace{5px}\\
+{\Large \textbf{Partie 2 : Présentation du projet, analyse et conception}} \\
+\tab Cette partie contient deux chapitres :\vspace{5px}\\
+\textbf{Chapitre 3 : Contexte du projet} \vspace{5px}\\
+\tab Ce chapitre présente le contexte du projet et éclaircit la problématique ainsi que les principaux  objectifs à accomplir pendant ce  mémoire. \vspace{5px}\\
+\textbf{Chapitre 4 : Analyse de besoins et conception}\vspace{5px}\\
+\tab  Dans ce chapitre, nous exposons notre analyse de besoins et notre conception de la solution, voir les différents modules du système : la détection de personnes, le suivi d'une personne et la navigation sociale tout en détaillant leurs principes de fonctionnement ainsi que les différents algorithmes utilisés.\vspace{5px}\\ \\
+{\Large \textbf{Partie 3 : implémentation, tests et résultats}}\vspace{5px}\\ 
+\tab Cette partie englobe  aussi deux chapitres :\vspace{5px}\\
+\textbf{Chapitre 5 : Implémentation}\vspace{5px}\\ 
+\tab Ce chapitre comporte une présentation de la plate-forme robotique, les outils utilisés pour la programmation et la visualisation des résultats ainsi que le résultat de l'implémentation. \vspace{5px}\\
+\textbf{Chapitre 6 : Tests et résultats}\vspace{5px}\\ 
+\tab Ce chapitre montre les résultats de quelques tests effectués sur le système, des résultats qui prouvent le bon fonctionnement de notre système ainsi que ses performances. \vspace{5px}\\
+\tab Enfin, nous clôturons ce rapport avec une conclusion et des perspectives du travail. 
+

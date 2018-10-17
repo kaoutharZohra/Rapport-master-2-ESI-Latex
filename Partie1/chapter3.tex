@@ -1,0 +1,500 @@
+\chapter{La détection des anti-patrons linguistiques}
+Après avoir abordé dans le chapitre précédant la notion de Lexicon Bad Smell et d'anti-patrons linguistique, nous présentons dans ce chapitre comment les détecter à travers des pseudo-algorithmes.
+
+\vspace{0.5cm}
+\newline
+\textbf{Pourquoi est-il important de détecter les anti-patrons linguistiques?}\\
+Les identificateurs mal choisis augmentent l’effort de compréhension du code source, ces identificateurs peuvent être des mots du dictionnaire, acronymes, ou de simples chaînes de caractères.
+\newline
+L’utilisation des termes identiques dans différents contextes peut augmenter le risque d’apparition de fautes. Cette information prouvée en utilisant deux métriques:l’entropie d’un terme et la couverture d’un contexte par un terme,le but est de montrer que le choix de certains termes augmente la prédisposition aux fautes. Deux métriques sont exploitées à ce niveau:
+\begin{itemize}
+    
+
+\item L’entropie d'un terme:  mesure la dispersion physique qui est  le degré auquel un terme est éparpillé à travers les identificateurs des différentes entités \cite{arnaoudova2010defining}.
+\item La couverture d’un contexte: mesure la dispersion conceptuelle qui est la relation entre ces entités \cite{arnaoudova2010defining}.
+\end{itemize}
+Si ces deux mesures sont élevées ça veut dire que les termes qui sont beaucoup éparpillés dans le programme  sont utilisés dans des entités non reliées l’une à l’autre  ce qui augmente le risque de prédisposition aux fautes.\\
+
+\section{La détection des Lexicon Bas Smells }
+Dans ce paragraphe, nous citons les différents algorithmes utilisés pour détecter les Lexicon bad smells détaillés dans la section \ref{lbs}. 
+\begin{enumerate}
+\item \textbf{Structure grammaticale bizarre :}
+L'algorithme commence par une grammaire définissant la structure de l'entité( classe, attribut ou méthode) en entrée, et un ensemble vide de bad smells, les identificateurs sont décortiqués par la suite syntaxiquement( ie, voir chaque terme de l'identificateur s'il est un nom ou un verbe) en utilisant un analyseur de langage naturel(NLP), puis cet identificateur est analysé selon la grammaire en entrée. Si un symptôme est détecté, un Lexicon bad smell est ajouté à l'ensemble \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+Input:\newline
+ grammar: grammar for ClassIdentifier, MethodIdentifier, ...\newline
+ Output:\newline
+ violations: Set<BadSmell>\newline
+ 1. violation = emptySet \newline
+ 2. parse id using NLP parser (output is a sequence of syntactical types)\newline
+ 3. parse id according to grammar\newline
+ 4. if parse error\newline
+ 5.    add <id> to violations\newline
+ }
+\end{framed}
+\newline
+
+\item \textbf {Terme utilisé pour nommer le tout est ses composants :}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+Ensuite, on vérifie si le dernier terme de l'identificateur de la classe est une sous chaîne de caractères des identificateurs fils, si c'est le cas, un nouveau bad smell est ajouté à l'ensemble \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+User input:\newline
+ directory: String\newline
+ Program generated input:\newline
+ identifierNames: xmlElement\newline
+ 1.identifierNames = new xmlElement("IdentifierNames")\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	if (xmlRoot has classElement)\newline
+ 5.		childElement = new xmlElement("Class")\newline
+ 6.             classElement = getClassElement (xmlRoot)\newline
+ 7.		childNodes = extractIdentifiersNamesIn("Attribute", classElement)\newline
+ 8.		childElement.append(childNodes)\newline
+ 9.             childNodes = extractIdentifiersNamesIn("Method", classElement)\newline
+ 10.		childElement.append(childNodes)\newline
+ 11.		identifiers.append(childElement)\newline
+ 12.	end if\newline
+ 13.end for\newline
+ Output:\newline
+ violation: Set<BadSmell>\newline
+ 1. violations = emptySet\newline
+ 2. for each classRoot: getClassElements(identifierNames)\newline
+ 3.     lastNoun = getClassNameLastNoun(classRoot)\newline
+ 4.     for each identifierName: getChildrenNames(classRoot)\newline
+ 5.	    if (lastNoun subStringOf identifierName)\newline
+ 6.	       add <identifierName, getClassElementName(classRoot)> to violations\newline
+ 7. end for\newline
+}
+\end{framed}
+
+\newline
+\item \textbf {	Utilisation d’un identificateur inconsistant :}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+Dans la même classe, on vérifie si chaque identificateur de méthode ou d'attribut n'est pas contenu entièrement dans un identificateur de méthode ou d'attribut \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+User input:\newline
+directory: String\newline
+Program generated input:\newline
+identifierNames: xmlElement\newline
+1.identifierNames = new xmlElement("IdentifierNameTerms")\newline
+2.for each file.xml in directory\newline
+	xmlRoot = getXMLRoot(file.xml)\newline
+	if (xmlRoot has classElement)\newline
+		childElement = new xmlElement("Class")\newline
+		classElement = getClassElement (xmlRoot)\newline
+		childNodes = extractIdentifiersNamesIn("Attribute", classElement)\newline
+		childElement.append(childNodes)\newline
+		childNodes = extractIdentifiersNamesIn("Method", classElement)\newline
+		childElement.append(childNodes)\newline
+		identifiers.append(childElement)\newline
+	end if\newline
+13.end for\newline
+Output:\newline
+violations: Set<BadSmell>\newline
+1.violations: emptySet\newline
+2.for each classElement:getClassElements(identifierNames)\newline
+3.   attributeNames = getChildNames("Attribute", classElement)\newline
+4.   methodNames = getChildNames("Method", classElement)\newline
+5.   checkConsistency (attributeNames)\newline
+6.   checkConsistency (methodNames)\newline
+7.end for\newline
+8.\newline
+9. function checkConsistency (identifierNames): void\newline
+10.	for each id:identifierNames\newline
+11.	    for each idSecond : identifierNames\newline
+if id subStringOf idSecond && !id equals idSecond\newline
+add<id, idSecond> to violations\newline
+end for\newline
+}
+\end{framed}
+\newline
+\item \textbf {	Indication inutile du type :}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+En utilisant une collection qui contient les différents types d'attributs sous formes de chaines de caractère, on vérifie pour chaque identificateur de l'arbre s'il contient son type \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+User input:\newline
+ basicLibTypes: Set<String>\newline
+ directory: String\newline
+ Program generated input:\newline
+ identifiers: xmlElement(Identifiers)\newline
+ 1.identifiers = new xmlElement(Identifiers)\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	childNodes = extractAttributeIdentifiersAndTypeIn(xmlRoot)\newline
+ 5.	identifiers.append(childNodes)\newline
+ 6.end for\newline
+ Output:\newline
+ violations: Set<BadSmell>\newline
+ 1.violation = emptySet\newline
+ 2.for each identifierName: getIdentifier(identifiers)\newline
+ 3.   if (containsType (identifierName)\newline
+ 4.         add <identifierName> to violations\newline
+ }
+\end{framed}
+
+\newline
+
+
+
+
+\item \textbf {Règles de construction d’un identificateur :}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+En définissant à priori des règles de construction d'identificateurs selon la convention de nomination, cet algorithme vérifie que chaque identificateur suit ses règles de construction \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+User input:\newline
+ namingRules: xmlFile\newline
+ direcotory: String\newline
+ Program generated input:\newline
+ identifierNames: xmlElement\newline
+ 1.identifierNames = new xmlElement("IdentifierNames")\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	if (xmlRoot has classElement)\newline
+ 5.		childElement = new xmlElement("Class")\newline
+ 6.             classElement = getClassElement (xmlRoot)\newline
+ 7.		childNodes = extractIdentifiersName-sIn("Attribute", classElement)\newline
+ 8.		childElement.append(childNodes)\newline
+ 9.             childNodes = extractIdentifiersNamesIn("Method", classElement)\newline
+ 10.		childElement.append(childNodes)\newline
+ 11.		identifiers.append(childElement)\newline
+ 12.	end if\newline
+ 13.end for\newline
+ Output:\newline
+ Violations: Set<BadSmell>\newline
+ 1. violations: emptySet\newline
+ 2. checkNamingRule( getChildElements ("Class", identifiers), getRules("Class", namingRules ) )\newline
+ 3. checkNamingRule( getChildElements ("Attribute", identifiers), getRules("Attribute", namingRules ) )\newline
+ 4. checkNamingRule( getChildElements ("Method", identifiers), getRules("Method", namingRules ) )\newline
+  function checkNamingRule (identifierNames, rules, entity): void \newline
+ 5.    for each id:identifierNames\newline
+ 6.	    if (violatesAllRules(id, rules) )\newline
+ 7.		add<id, entity> to violations\newline
+ 8.    end for\newline
+ }
+\end{framed}
+\newline
+\item \textbf {	Termes extrêmement courts :}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+En définissant un seuil avec lequel on compare le nombre de caractères des identificateurs pour décider si c'est un lexicon bas smell ou non    \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+User input:\newline
+ threshold: int\newline
+ directory: String //Directory which contains the source files transformed to xml (using src2Srcml)\newline
+ Program generated input:\newline
+ identifiers: xmlElement\newline
+ 1.identifiers = new xmlElement(Identifiers)\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	childNodes = extractIdentifiersIn(xmlRoot)\newline
+ 5.	identifiers.append(childNodes)\newline
+ 6.end for\newline
+ Output:\newline
+ violations: Set<BadSmell>\newline
+ 1.violations = emptySet\newline
+ 2. for each identifierName: getChilderen(identifiers)\newline
+ 3.	hardWords=getHardWords(identifierName)\newline
+ 4.	for each hardWord: hardWords\newline
+ 5.	    if size(hardWord) <= threshold\newline
+ 6.	          add <identifierName, hardWord> to violations\newline
+}
+\end{framed}
+
+\newline
+\item \textbf {	Mots mal orthographiés :}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+Cet algorithme utilise la fonction spellCheck qui vérifie l'orthographe d'un identificateur, si elle retourne vrai, ce lexicon bad smell est ajouté à l'ensemble \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+User input:\newline
+ minimumLength: int\newline
+ directory: String //Directory which contains the source files transformed to xml (using src2Srcml)\newline
+ Program generated input:\newline
+ identifierNames: xmlElement\newline
+ 1.identifierNames = new xmlElement(Identifiers)\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	childNodes = extractIdentifiersIn(xmlRoot)\newline
+ 5.	identifierNames.append(childNodes)\newline
+ 6.end for\newline
+ Output:\newline
+ Violations: Set<BadSmell>\newline
+ 1.violations: emptySet\newline
+ 2.for each id: getChildren(identifierNames)\newline
+ 3.	hardWords=getHardWords(id)\newline
+ 4.	for each hardWord: hardWords\newline
+ 5.         if (length(hardWord >= minimumLength )\newline
+ 6.		spellCheckResult = spellCheck(hardWord)\newline
+ 7.		if not spellCheckResult is empty\newline
+ 8.			add<id, hardword> to violation\newline
+ 9.         end if\newline
+ 10.     end for\newline
+ 11.end for\newline
+ }
+\end{framed}
+\newline
+\item \textbf {	Identificateurs surchargés :}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, en tenant compte de la catégorie de l'entité, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+\newline
+On vérifie si les identificateurs des méthodes contiennent plus d'un verbe  ou si les identificateurs des classes et des attributs contiennent plus d'un nom, si c'est le cas, ce lexicon bad smell est ajouté à l'ensemble \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+Input:\newline
+ directory: String\newline
+ Program generated input:\newline
+ identifiers: Element\newline
+ 1.identifiers = new xmlElement(Identifiers)\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	for each C:Category\newline
+ 5.		childElement = new xmlElement(C)\newline
+ 6.		childNodes = extractIdentifiersIn(C, xmlRoot)\newline
+ 7.		childElement.append(childNodes)\newline
+ 8.		identifiers.append(childElement)\newline
+ 9.	end for\newline
+ 10.end for\newline
+ Output:\newline
+ Violations: Set<BadSmell>\newline
+ 1.violations: emptySet\newline
+ 2.for each id: getChildren(identifiers, C)\newline
+ 3.	syntacticalTypes = parse id using NLP parser\newline
+ 4.	if C is function\newline
+ 5.		if countVerbs(syntacticalType) > 1\newline
+ 6. 			add <id> to violations\newline
+ 7.	 else\newline
+ 8.		if countNouns(syntacticalType) >1\newline
+ 9.			add<id> to violations\newline
+}
+\end{framed}
+\item \textbf {Des termes sans signification:}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, en tenant compte de la catégorie de l'entité, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+\newline
+Cet algorithme utilise une collection de termes inutiles pour chaque type d'entité, et pour chaque identificateur, il vérifie pour chaque catégorie si ses identificateurs appartiennent à la collection de cette catégorie  \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+
+User input:\newline
+ meaniglessTerms: Vocabulary<C: Category>\newline
+ direcotory: String\newline
+ Program generated input:\newline
+ identifiers: xmlElement\newline
+ 1.identifiers = new xmlElement(Identifiers)\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	for each C:Category\newline
+ 5.		childElement = new xmlElement(C)\newline
+ 6.		childNodes = extractIdentifiersIn(C, xmlRoot)\newline
+ 7.		childElement.append(childNodes)\newline
+ 8.		identifiers.append(childElement)\newline
+ 9.	end for\newline
+ 10.end for\newline
+ Output:\newline
+ violations: Set<BadSmell>\newline
+ 1. violations := emptySet\newline
+ 2. for each C: Category\newline
+ 3.   for each id: getChildren(identifiers, C)\newline
+ 4.     while hardWord=getNextHardWord()\newline
+ 5.         if hardWord in meaninglessTerms<C>\newline
+ 6.            add <id, hardWord> to violations\newline
+}
+\end{framed}
+\item \textbf {Synonymes et identificateurs similaires:}
+Avant de lancer l'algorithme de détection, on génère pour chaque fichier contenant une classe, un arbre dont la racine est l'identificateur de la classe, et les fils sont les identificateurs des attributs et méthodes de cette classe.
+Nous vérifions ici si deux identificateurs sont synonymes,en construisant pour chaque identificateur, sa collection de synonymes, ensuite nous vérifions si d'autres identificateurs appartiennent à cette collection. Pour vérifier la similarité, on utilise une fonction qui calcule la distance entre deux identificateurs \cite{abebe2009lexicon}.
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+User input:\newline
+ directory: String
+ Program generated input:\newline
+ identifierNameTerms: xmlElement\newline
+ 1.identifierNameTerms = new xmlElement(IdentifierNameTerms)\newline
+ 2.for each file.xml in directory\newline
+ 3.	xmlRoot = getXMLRoot(file.xml)\newline
+ 4.	if (xmlRoot has classElement)\newline
+ 5.		childElement = new xmlElement("Class")\newline
+ 6.             classElement = getClassElement (xmlRoot)\newline
+ 7.		childNodes = extractIdentifiersNameTerm-sIn("Attribute", classElement)\newline
+ 8.		childElement.append(childNodes)\newline
+ 9.             childNodes = extractIdentifiersNameTerm-sIn("Method", classElement)\newline
+ 10.		childElement.append(childNodes)\newline
+ 11.		identifiers.append(childElement)\newline
+ 12.	end if \newline
+ 13.end for\newline
+ Output:\newline
+ similarityViolations: Set<BadSmell>\newline
+ synonymViolations:Set<BadSmell>\newline
+ 1.similarityViolations = emptySet\newline
+ 2.synonymViolations = emptySet\newline
+ 3.for each classRoot: getClassElements(identifierNameTerms)\newline
+ 4.   for each term: getChildren(classRoot, C)\newline
+ 5.	synsetTerms = getSynset(term)\newline
+ 6.	for each D: Entity\newline
+ 7.		for each secondTerm: getChilderen(classRoot, D)\newline
+ 8.			if secondTerm in synsetTerms\newline
+ 9.				add<term, secondTerm> to synonymViolation\newline
+ 10.			if isSimilar(term, secondTerm)\newline
+ 11.				add<term, secondTerm> to similarityViolation\newline
+ 12.		end for\newline
+ 13.  end for\newline
+ 14.end for\newline
+}
+\end{framed}
+\item \textbf {Termes dans un faux contexte:}
+Selon la logique et la mission des différentes entités, le code source est décomposé en packages et classes, cet algorithme vérifie si les identificateurs sont utilisés dans le bon contexte en mesurant la propagation des identificateurs dans le code \cite{abebe2009lexicon}.
+\newline
+	
+	\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+ User input:\newline
+ prominentTermsThreshold: int\newline
+ spreadTermsThreshold: int\newline
+ Output:\newline
+ violations: Set<BadSmell>\newline
+ 1. violations = emptySet\newline
+ 2. crossCuttingTerms = getMostSpreadTerms(spreadTermsThreshold)\newline
+ 3. for each p: package\newline
+ 4.    add <getMostFrequentTerms(p, prominentTermsThreshold)> to prominentTermsList\newline
+ 5. for each p: package\newline
+ 6.    for each term: getTerms(p)\newline
+ 7.      if not ( (term in crossCuttingTerms) || (term in prominentTerm-sListp?) )\newline
+ 8.         add <term, p> to violations\newline
+}
+\end{framed}
+\newline
+\item \textbf {Hierarchie des classes sans relation d’hypernymy/hyponymy :}
+En utilisant WordNet, on établie la relation entre les termes utilisés dans les identificateurs, pour pouvoir détecter la relation d’hypernymy/hyponymy entre les identificateurs des classes mère et leurs classes héritées \cite{abebe2009lexicon}.
+\newline
+	
+	\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+ Input:\newline
+ classNodes: Nodes\newline
+ dictionaryWords: Set<String>\newline
+ Output:\newline
+ Violations: Set<BadSmell>\newline
+ 1.violations = \newline
+ 2.for each class: classNodes\newline
+ 3.	className = getClassName()\newline
+ 4.	if className in dictionaryWords\newline
+ 5.		supperClassName = getSupperClassName(className)\newline
+ 6.		if supperClassName not null and supperClassName in dictionaryWords\newline
+ 7.			if not className in getHyponyms(supperClassName)\newline
+ 8.				add<className, supperClassName> to violation\newline
+ 9.     end if\newline
+ 10.end for\newline
+}
+\end{framed}
+\end{enumerate}
+\section{Détection des anti-patrons linguistiques}
+Dans ce paragraphe, nous expliquons comment on peut détecter les anti-patrons linguistiques détaillés dans la section \ref{aplinguistique}, sachant que 
+toute détection d’anti-patron doit passer par deux étapes: \cite{brown1998antipatterns}:
+\begin{itemize}
+    
+
+\item Extraire les informations du code source pour identifier les symptômes des mauvais choix
+\item Définir les bons algorithmes pour savoir les anti-patrons linguistiques correspondants aux symptômes extraites.
+\end{itemize}
+
+La détection des anti-patrons linguistiques est reliée à des domaines \cite{arnaoudova2016linguistic}:
+\begin{enumerate}
+
+
+\item L’entropie et les métriques basées sur la récupération de l’information (information retrieval -based metrics):\\ Plusieurs métriques basées sur l’entropie existent, elles peuvent être appliquées pour expliquer les changements qu’une classe subit à travers plusieurs versions, utilisées pour expliquer la cohésion d’un composant. Les méthodes de  la récupération de l’information sont utilisées aussi pour mesurer la qualité d’un code , par exemple, elle servent à mesurer la complexité d’un programme orienté objet. Les SVMs et Latent Semantic Indexing(LSI) sont utilisés pour mesurer la cohésion d’une classe, les SVMs sont appliqués pour extraire les identificateurs des entités d’une part, et les identificateurs des commentaires d'autre part et la similarité entre eux indique des entités de bonne qualité.
+\item Métriques et prédisposition aux fautes:\\
+Ce sont les recherches qui ont pour but de trouver les bonnes métriques comme LOC et CBO qui pré-dictent le mieux les fautes en calculant la corrélation entre ces métriques et la prédisposition aux fautes.
+\item L’information linguistique d’un code source:\\
+Concerne les recherches de langues essentiellement comme l’ambiguïté lexicale, le refactoring stratégique des identificateurs du code source basé sur le lexique standard. D’autres recherches dans ce domaine ont montré que les programmes commentés sont mieux compris par rapport aux programmes non commentés,les programmes contenant des identificateurs à mots complets sont mieux compris par rapport aux programmes qui contiennent des identificateurs à mots incomplets.
+\item Traitement du langage naturel:\\
+Ce domaine s’intéresse à trouver et mesurer les différents types d’ambiguïté(lexicale, syntaxique…) dans le langage naturel. A cause de cette ambiguïté, une expression peut être comprise de deux manières différentes.
+\end{enumerate}
+\\
+\newline
+Dans le paragraphe suivant, nous détaillons la détection des anti-patrons linguistiques cités dans la section \ref{aplinguistique} \cite{arnaoudova2016linguistic}:\\
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\subsection{Détection des anti-patrons linguistiques de type "Does more than it says"}
+\begin{enumerate}
+    
+
+\item \textbf{Plus que des getters}\\
+Trouver les getters, qui sont les méthodes qui commencent par «get» et se terminent par une chaîne de caractères qui correspond à un attribut de même classe,le type de cet attribut et le type de la valeur retournée par le getter doivent être les mêmes. Ensuite,identifier les getters qui fournissent des actions autres que retourner une valeur d’attribut. Des cas où l’attribut est mis à jour avant qu’il soit retourné ne sont pas pris en compte, comme le patron proxy et singleton.
+Pour une détection basée sur les expressions du sommet de l’arbre syntaxique abstrait( AST)  autres que l’instruction return est permise sauf dans le cas où un fils d’un control de condition pour la valeur nulle. Autres mesures de complexité comme LOC  ou la complexité cyclomatique de McCabe peuvent être utilisés pour une détection simple mais moins exacte.
+\item \textbf{plus qu’une méthode «is»}\\
+Trouver les méthodes qui commencent par «is» dont le type de retour 
+\item \textbf{Setter avec retour}\\
+Trouver les méthodes qui commencent par « set » dont le type de retour est different de void.
+\item \textbf{Attendre mais pas recevoir une seule instance}\\
+Trouver les méthodes qui retournent une collection ( vecteur,tableau…) dont le nom se terminent par un nom en singulier et qui ne contient pas un mot qui signifie une collection.
+\end{enumerate}
+\subsection{Détection des anti-patrons linguistiques de type "Says More than it Does"}
+\begin{enumerate}
+\item \textbf{Condition non implémentée}\\
+Trouver les méthodes contenant au moins une phrase conditionnelle dans les commentaires, sans qu’il y a des instructions de conditions dans le code.
+\item \textbf{Méthode de validation qui ne confirme pas}\\
+Trouver les méthodes de validation dont le nom commence par «validate »,check, ensure...etc où le type de retour est void ,sans qu’il y a les instructions d’exception.
+\item \textbf{Une méthode getter qui ne retourne rien}\\
+Trouver les méthodes dont le nom donne l’impression qu’il y a une valeur de retour mais dont le type de retour est void.
+\item \textbf {Question sans réponse}\\
+Trouver les méthodes dont le nom commencent par : is ou has, ie, il donne l’impression d’une question,mais le type de retour est void.
+\item \textbf{Méthode de transformation sans retour}\\
+Trouver les méthode dont le nom propose une transformation, exemple : toString,list2array...etc mais le type de retour est void.
+\item \textbf{Attendre une collection mais ne pas la recevoir}\\
+Trouver les méthodes don le nom  donne l’impression qu ‘elle retourne un collection,par exemple, qui commence par «get», «return»…,mais le type de retour n’est pas une collection.
+\end{enumerate}
+
+\subsection{Détection des anti-patrons linguistiques de type "Does the Opposite"}
+\begin{enumerate}
+\item \textbf{Le nom de la méthode et le type de retour sont opposés}\\
+Trouver les méthodes dont le nom et le type de retour sont des acronymes.
+ \iextbf{La signature de la méthode et les commentaires sont opposé}\\
+Trouver les méthode dont le nom ou le type de retour possède une relation d’acronyme avec son commentaire.
+\end{enumerate}
+\subsection{Détection des anti-patrons linguistiques de type "Contains more that it says"}
+\begin{enumerate}
+    \item \textbf{Dit une chose mais contient beaucoup de choses}\\
+    Trouver les attributs dont le nom se terminent par un nom singulier mais il est déclaré de type collection.
+\item \textbf{Nom de booléen mais le type non booléen}\\
+Trouver les attributs dont le nom  commence par  un verbe conjugué au troisième pronom personnel « is » où « has » par exemple, ou qui se termine par un gérondif mais il est déclaré de type autre que booléen.
+\end{enumerate}
+\subsection{Détection des anti-patrons linguistiques de type "Says more than it contains"}
+\begin{enumerate}
+    
+
+\item \textbf{Dit beaucoup de choses mais contient une seule}\\
+trouver les attributs contenant un nom au pluriel mais déclaré de type autre que collection.
+\subsection{Détection des anti-patrons linguistiques de type "Contains the opposite"}
+\end{enumerate}
+\begin{enumerate}
+    
+
+\item \textbf{L'attribut et son type sont opposés}\\
+Trouver les attributs dont le nom et leur type de déclaration sont opposés.
+\item \textbf{ La signature de l’attribut et le commentaire sont opposés}
+\\Trouver les attributs dont le nom ou bien le type de déclaration possède une relation d’acronyme avec son commentaire.
+\end{enumerate}
+
+\section{Implémentions d’un outil de  détection des anti-patrons linguistiques}
+Pour implémenter un outil de détection automatiques des anti-patrons linguistiques, on procède par des étapes qui sont \cite{arnaoudova2013new}:\\
+\begin{enumerate}
+    
+
+\item \textbf {Extraction des faits à partir du code source}: En utilisant un outil analyseur(parser) comme srcml tool on génère un arbre d’analyse à l’aide duquel on collecte les éléments utiles comme les attributs, les noms des méthodes, les commentaires, la présence des exceptions et des conditions
+\item \textbf {Analyse des identificateurs et des commentaires}:
+Cette étape a pour but d’identifier les termes qui composent les identificateurs,d’abord en appliquant les heuristiques «camel case» et «under score» pour avoir les termes, puis en utilisant l’analyseur de Stanford pour le langage naturel pour savoir si un terme est un nom , adjective ou adverbe...etc,savoir si un nom est au singulier ou au pluriel, la relation entre les mots comme la négation.
+\item \textbf{Lier entre les termes des identificateurs et les termes des commentaires}: En utilisant l’outil WordNet ontology, des liaisons de synonymes ou  d’acronymes sont établies.
+\end{enumerate}
+
+\section{Synthèse}
+\begin{itemize}
+    \item Les lexicon bad smells cités dans la section \ref{lbs}, jouent un rôle important dans l'amélioration du code source, ainsi que les anti-patrons linguistiques définis dans la section \ref{aplinguistique}, mais aucune relation n'est établi entre les lexicon bad smells et les anti-patrons linguistiques, pourtant ces deux notions agissent sur le lexique du code source.
+    \item Les pseudo-algorithmes permettant la détection des Lexicon bad smells nécessitent d'être prioritisés, c'est à dire, l'existence de lexicon bad smell prioritaire et le refactorer permet de nous éviter d'exécuter des algorithmes de détection des lexicon bad smells moins prioritaires inutilement, par exemple, entre termes extrêmement courts et des termes sans signification, dans le cas ou il y a des termes très courts, il est tès probable que l'identificateur sera sans signification, par conséquent enlever les courts termes nous évitera d'y appliquer l'algorithme des termes sans signification.
+  \item Il est nécessaire d'établir la relation de corrélation entre les lexicon bad smells et les anti-patrons linguistiques afin d'optimiser l'étape de refactoring.
+    \item L'absence d'un modèle connu pour l'algorithme de détection des lexicon bad smells et des anti-patrons linguistiques, avec la définition des entrées à fournir et les sorties à avoir.
+    \item Dans le chapitre 1 et 2, nous avons abordé les différentes notions que pour qu'un code orienté objet soit bien écrit en anglais suivant des conventions,en supposant qu'il est écrit suivant des conventions de nomination, or c'est pas toujours le cas, par conséquent, une étape de vérification est importante avant d'appliquer les méthodes de détection citées, pour maximiser les bons résultats.
+-Puisque le but final est d'améliorer la qualité du code, et d'après la brève étude établie sur les métriques structurales, nous pensons que la combinaison entre l'application de ces métriques avec la notion de lexicon bad smell et d'anti-patron linguistique va permettre de donner de meilleurs résultats.
+\item Le refactoring appliqué après la détection d'un lexicon bad smell ou d'un anti-patron linguistique, reste une opération manuelle qui peut aussi engendrer d'autres lexicon bad smells ou d'autres anti-patrons linguistiques, c'est pourquoi, une étape de proposition automatique d'actions de refactoring qui conviennent mieux à la situation est importante pour ne pas perdre les résultats de détection.
+\end{itemize}

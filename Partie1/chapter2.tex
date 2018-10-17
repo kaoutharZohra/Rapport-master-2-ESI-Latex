@@ -1,0 +1,704 @@
+\chapter{Les anti-Patrons linguistiques }
+Dans le chapitre précédant, nous avons expliqué ce que c'est un patron de conception  et ce que c'est un anti-patron de conception ainsi que les approches connues de détection des anti-patrons.
+  \vspace{5px}
+Dans ce chapitre, nous nous intéressons à une classe bien particulière des anti-patrons qui est les anti-patrons linguistiques, nous commençons par comprendre c'est quoi un lexicon bad smells et puis expliquer la notion d'anti-patron linguistique.
+\section{La relation entre le lexique du code et sa qualité }
+Le réglage des bugs dans les logiciels en cours de production est une tache très coûteuse en terme de temps et d’argents pour les entreprises, c’est pourquoi, 
+les développeurs, donnent une grande importance à la tache de test pour identifier les classes pouvant causer des bugs dans le futur (faulty classes) 
+et atteindre le but de prédire quelles classes sont plus exposées à causer des bugs (ie Faulty classes prédiction). Pour supporter la tache de test, qui a pour finalité, 
+d’améliorer la qualité logicielle, des recherches ont été menées pour mesurer la qualité logicielle. Ces recherches portent sur plusieurs axes, parmi ces axes: 
+les métriques structurales, les métriques des processus (process metrics), et les fautes précédentes(previous faults)\cite{abebe2012can}.
+\newline
+Les métriques structurales sont largement utilisées( comme par exemple DIT :depth of inheritance tree et CBO : coupling between objects), car le code est complexe et difficile à comprendre, et pour éviter d’y entrer, il est utile d’avoir des informations concernant la structure générale de ce code.
+\newline
+D’autre part,il y a des recherches qui donnent de l’importance aux identificateurs, \cite{haiduc2008use}, \cite{butler2009relating}, et le lexique du code sources qui peut largement influencer la compréhensibilité du code( documentation insuffisantes, convention de nomination différente et pas nécessairement toujours suivie), le code peut être lu par d'autres personnes autres que ceux qui l’ont écrit, testeurs différents des codeurs, changement des employés, remplacements et bien d'autres situations, donc, ça sera très bénéfique d’améliorer le lexique du code, pour augmenter sa compressibilité et donc améliorer les tests pour  améliorer la qualité logicielle par la suite\cite{abebe2012can}.
+\newline
+Pour atteindre ce but, il vaut mieux améliorer la qualité du lexique utilisé dans le code source.
+\newline
+ \vspace{5px}
+A partir de ce constat, des études ont été menées pour cerner les différentes fautes concernant le lexique(choix d’identificateurs, noms de classes, termes utilisés dans les commentaires..etc) pour les éviter.
+D’où la naissance du Lexicon Bad smells et les anti patrons linguistiques.
+\section{Lexicon Bad Smells }
+\label{lbs}
+Dans ce paragraphe, nous présentons les différents lexicon bad smells trouvés dans la littérature qui peuvent être utiles dans la prédiction des anti-patrons linguistiques ou même peuvent être considérés comme des anti-patrons linguistiques, pour pouvoir citer les algorithmes de détection plus tard dans ce rapport, nous les représentons en suivant un modèle\cite{abebe2009lexicon}:
+\begin{itemize}
+    \item Description: description générale du lexicon bad smell.
+    \item Symptômes : les signes sur lequel on se base pour décider sur l'existence du lexison bad smell.
+    \item Un exemple
+    \item Refactoring : quoi faire pour régler ce lexicon bad smell.
+\end{itemize}
+\newline
+Dans le paragraphe suivant, nous présentons quelques lexicon bad smells\cite{abebe2012can}.
+\begin{enumerate}
+    \item \textbf {Structure grammaticale bizarre :}
+Ce lexicon bad smell est envisagé si la structure grammaticale de l’identificateur ne convient pas la nature et le rôle  de cet identificateur.
+\begin{itemize}
+    \item \textbf{Symptômes} : la syntaxe de l’identificateur n’est pas respectée, par exemple :
+    \begin{itemize}
+        \item  L’identificateur d’une classe doit contenir au moins un nom et aucun verbe.
+        \item  L’identificateur d’une méthode doit commencer par un verbe.
+        \item  l’identificateur d’un attribut ne doit contenir aucun verbe.
+  \end{itemize}
+\item \textbf{Exemple :}
+
+\begin{framed}
+{\fontfamily{qcr}\selectfont
+class Compute \{ //verb
+\newline
+public void initialization(); //noun
+\newline
+\}
+}
+\end{framed}
+
+ 
+   
+\item \textbf{Refactoring }:
+L’identificateur de l’entité doit être renommé en respectant les règles syntaxiques selon le type de l’entité( classe, méthode ou attribut)
+\end{itemize}  
+\item \textbf {Terme utilisé pour nommer le tout et ses composants :}
+
+C'est le cas où le même terme est utilisé pour nommer un concept et ses propriétés et opérations.
+\begin{itemize}
+\item \textbf{Symptômes} :
+Ce bad smell apparait si un même terme est utilisé pour identifier une classe et en même temps, un attribut et/ou une méthode dans cette classe.
+Ça peut engendrer une redondance ou une mal utilisation du terme.
+\item \textbf{Exemple}:
+
+
+ \begin{framed}
+ {\fontfamily{qcr}\selectfont
+class Account \{ \newline
+int account; // Ambiguous use \newline
+void computeAccount();\newline
+// Account is redundant information \newline
+\}
+}
+  \end{framed}   
+  \item \textbf{Refactoring}
+Renommer chaque entité pour éviter la redondance ,en tenant compte des règles syntaxique cités dans le lexicon bad smell précédant.
+\end{itemize}
+\newline
+\item \textbf {Utilisation d’un identificateur inconsistant :}
+Les identificateurs représentent des concepts d’une manière non concise et non consistante.
+\begin{itemize}
+\item \textbf {Symptômes :}
+Nous trouvons qu’un même terme se trouve dans plusieurs identificateurs (de même type d’entité) dans le même emplacement.
+\item \textbf {Exemple :}
+
+
+\begin{framed}
+ {\fontfamily{qcr}\selectfont
+class Documents  \{ \newline
+private String absolute\_path;\newline
+private String relative\_path;\newline
+// path has ambiguous meaning\newline
+private String path;\newline
+\}
+}
+  \end{framed}   
+
+  \item \textbf {Refactoring :}
+  \begin{itemize}
+\item Renommer les identificateurs en choisissant des termes plus exactes et plus significatifs.
+\item suprimmer les identificateurs ambigus qui peuvent être représentés par l’un des autres identificateurs existant déjà dans le code.
+\end{itemize}
+\end{itemize}
+\item \textbf {Indication inutile du type :}
+Ce  bad smell apparaît si le type est explicitement indiqué dans l’identificateur.
+\begin{itemize}
+\item \textbf {Symptômes :}
+En analysant l’identificateur, nous trouvons un ou plusieurs termes spécifiant le type de l’identificateur qui y sont  ajoutés.
+\item \textbf {Exemple :}
+\begin{framed}
+{\fontfamily{qcr}\selectfont
+class Rental \{ \newline
+// type in attribute name\newline
+short key\_short;\newline
+\}
+}
+\end{framed}
+\item \textbf {Refactoring :}
+Supprimer tout terme indicant le type de l’identificateur.
+\end{itemize}
+\item \textbf {Règles de construction d’un identificateur :}
+La dénomination d'un identificateur composé ne suit pas une convention de dénomination standard pour les préfixes, les suffixes et les séparateurs de termes. 
+\begin{itemize}
+\item \textbf {Symptômes :}
+Une convention de dénomination existante pour les identifiteurs composés n'est pas respectée. Par exemple, l'utilisation de CamelCase dans un identificateur lorsque la plupart des autres utilisent le caractère de soulignement (c.-à-d., Camel\_case) ou l'utilisation du préfixe f pour les champs de classe dans la plupart des champs, à quelques exceptions près. 
+\item \textbf {Exemple :}
+\begin{framed}
+  {\fontfamily{qcr}\selectfont  
+class StudentInformation \{ \newline
+   private String fName;\newline
+   private String fAddress;\newline
+   private Date fBirthDate;\newline
+   private String gender;  // this doesn't start with f\newline
+   public void compute\_student\_GPA()  // this is the odd one\newline
+   public void getStudentAddress()\newline
+   public void setStudentAddress()\newline
+\}
+}
+\end{framed}
+\item \textbf {Refactoring}
+Renommer les identificateurs en question en suivant la convention de nomination.
+\end{itemize}
+\item \textbf {Termes extrêmement courts :}
+C’est dû à l’utilisation abusive d’une abréviation, sigle, acronyme au lieu d’utiliser le mot complet dans un identificateur.
+\begin{itemize}
+
+\item \textbf {Symptômes :}
+Ce Lexicon bad smell est détecté si le nombre de caractères dans un terme est inférieur à un seuil préfixé ( 2 ou 3) dans les identificateurs qui sont supposés être explicatifs ( nom de  classe ,méthode publique…etc) sauf dans le cas où ce court terme est justifié dans la convention de nomination ou s'il est connu( comme sql, msg..etc)
+
+\item \textbf {Exemple :}
+\begin{framed}
+    {\fontfamily{qcr}\selectfont
+
+class Detector \{\newline
+   public void clearLs() {} // Ls = List\newline
+ \}
+ }
+ \end{framed}
+\item \textbf {Refactoring :}
+Remplacer les courts termes par leurs signification complète, comme dans l’exemple ci-dessus,remplacer « ls »par « list ».
+\end{itemize}
+\item \textbf {Mots mal orthographiés :}
+Si le développeur, en écrivant les mots du code source ou les commentaires,commet une faute d’orthographe , ce lexicon bad smell apparait.
+\begin{itemize}
+\item \textbf {Symptômes :}
+L’apparition de fautes d’orthographe, selon le langage (anglais ou autre), dans les mots de code sources. Parmi ces fautes récurrentes: la duplication des lettres, l’inversement des lettres, ou l’oubli d’une ou plusieurs lettres.
+\item \textbf {Exemple:}
+\begin{framed}
+   {\fontfamily{qcr}\selectfont 
+
+class Examlpe \{...  \}  // l and p are reversed \newline
+ class Abbrvt \{ ...\} // uncommon abbreviation for Abbreviation\newline
+ }
+ \end{framed}
+\item \textbf {Refactoring :}
+Utiliser un correcteur automatique pour voir ses propositions des mots au fur et à mesure de l’écriture de code, pour éviter ce lexicon bad smell.
+\end{itemize}
+\item \textbf {Identificateurs surchargés :}
+L’identificateur contient plusieurs termes de contextes différents ce qui donne l’impression que l’entité qu’il identifie, fait plusieurs rôles.
+\begin{itemize}
+\item \textbf {Symptômes}
+\begin{itemize}
+\item Une méthode avec deux verbes ou plus.
+\item Un identificateur de classe, d’attribut  avec deux noms ou plus.
+\end{itemize}
+\item \textbf {Exemple :}
+\begin{framed}
+    {\fontfamily{qcr}\selectfont
+
+compute\_create\_document();\newline
+ //The method name indicates two responsibilities:\newline
+ //computing and creating a document\newline
+}
+\end{framed}
+\item \textbf {Refactoring :}
+Si l’entité possède plusieurs responsabilités, il faut séparer chaque responsabilité dans une entité à part, dans le cas d’une méthode dont l’identificateur se compose de deux verbes, il faut la diviser en deux méthodes, la première méthode a comme  identificateur le premier  verbe de l’identificateur d’origine et le deuxième verbe sera l’identificateur de la deuxième méthode.
+\end{itemize}
+\item \textbf {Des termes sans signification :}
+Des termes sans sens ou trop génériques sont utilisés dans le code source.
+\begin{itemize}
+\item \textbf {Symptômes :}
+Des termes sans sens ou trop génériques qui ne reflètent pas la logique métier du code source et le contexte de l'application sont utilisés comme identificateurs ou dans les commentaires.
+\item \textbf {Exemple:}
+\begin{framed}
+   
+ {\fontfamily{qcr}\selectfont
+class Detector \{ \newline
+	public void foo() \{\} //foo is a metasyntactic variable \newline
+ \}
+ }
+ \end{framed}
+
+\item \textbf {Refactoring :}
+Remplacer les termes sans signification par des termes qui représentent le rôle de l’entité.
+\end{itemize}
+
+\item \textbf {Synonymes et identificateurs similaires :}
+Sachant que la similarité est une mesure calculée en utilisant des distances bien connues et la synonimité est tirée à partir des bases de synonymes comme Worknet. Ce lexicon bad smell est détecté si des termes similaires ou synonymes sont utilisés pour identifier des entités différentes, ce qui engendre une ambiguïté, et complique la compréhension du code.
+\begin{itemize}
+\item \textbf {Symptômes :}
+Deux entités ou plus sont identifiées en utilisant des termes similaires ou synonymes.
+\item \textbf {Exemple :}
+\begin{framed}
+    {\fontfamily{qcr}\selectfont
+
+class IdentifierKey \{ \newline
+   String id;\newline
+   String key;\newline
+   public String idCopy (String text) \{\} // contains Copy\newline
+   public String keyCpy (String text) \{\} // contains Cpy, a contraction of Copy\newline
+\} 
+ }
+ \end{framed}
+\item \textbf {Refactoring :}
+
+Renommer les entités en choisissant des termes plus précis référant à leur fonctionnalité, et s'il y a des propriétés communes entre ces entités, il est recommandé d’utiliser l’héritage.
+\end{itemize}
+\item \textbf {Termes dans un faux contexte :}
+L’identificateur choisi donne l’impression que l’entité qu’il représente est mal placée.
+\begin{itemize}
+\item \textbf {Symptômes :}
+\begin{itemize}
+\item -Un identificateur de méthode qui donne l’impression qu’elle doit être mise dans une autre classe
+\item -Un identificateur de classe qui donne l’impression qu’elle doit être mise dans un autre package.
+\end{itemize}
+\item \textbf {Exemple :}
+\begin{framed}
+   {\fontfamily{qcr}\selectfont 
+
+ package collections;\newline
+   class IntArray\{...\} \newline
+   class TypeDetector \{...\} //in the wrong package or incorrectly named 
+ package detectors;\newline
+   class MuonDetector \{...\}\newline
+   class PhosDetector \{...\}\newline
+   class HLTDetector \{...\}\newline
+   }
+\end{framed}
+\item \textbf {Refactoring :}
+Revoir la logique du code source, renommer les entités, ou les déplacer dans le bon sous-systèmes auquel elles appartiennent.
+\end{itemize}
+\item \textbf {Hiérarchie des classes sans relation d’hypernymy/hyponymy :}
+La relation d’hypernymy/hyponymy est une relation entre les mots, par exemple on dit rouge, vert, bleu sont des hyponymes du mot couleur qui est leur hypernyme.
+Dans le cas où il y a un héritage entre les classes, l’absence de  cette relation d’hyponymes/hypernymes entres ces identificateurs cause ce lexicon bad smell.
+\begin{itemize}
+\item \textbf {Symptômes :}
+En analysant les identificateurs, nous trouvons que les identificateurs des classes filles composés d’un seul terme ne sont pas des hyponymes de identificateur composé d’un seul mot de leur classe mère.
+\item \textbf {Exemple :}
+\begin{framed}
+    {\fontfamily{qcr}\selectfont 
+
+class Animal \{  \}
+ class Mammal extends Animal \{  \} // Mammal is a hyponym of Animal - good\newline
+ class Violin extends Mammal \{  \}  // Violin is not a hyponym of Mammal - bad\newline
+ class SpecialViolin extends Violin \{  \} // this may be good\newline
+ class Rndm extends Violin \{  \} // this may be good\newline
+ }
+ \end{framed}
+\item \textbf {Refactoring :}
+\begin{itemize}
+
+\item Revoir la logique de l’héritage entre les classes.
+\item Renommer, si nécessaire, les identificateurs en choisissant les termes soigneusement, de telle manière à lier entre les termes sémantiquement.
+\end{itemize}
+\end{itemize}
+\end{enumerate}
+\section{Les anti-Patrons linguistiques}
+\label{aplinguistique}
+Ils représentent une sous-classe des anti-patrons de développement. Ils consistent en les mauvaises habitudes de nomination, de documentation et de choix d’identificateurs  des différentes entités(variables, méthodes, classe-pour les programmes OO-...etc) qui reviennent souvent dans les systèmes logiciels qui peuvent affecter la compréhension du code source et/ou la qualité logicielle \cite{brown1998antipatterns}.
+L’anti patron linguistique peut être documenté comme tout autre anti-patron. Dans ce rapport, nous présentons pour chaque anti-patron linguistique:
+\begin{itemize}
+\item Son nom
+\item Sa description
+\item Est ce qu’il concerne une méthode ou un attribut
+\item Un exemple tiré d’un vrai programme 
+\item Les conséquences possibles de cet anti-patron.
+\end{itemize}
+Puisque nous nous intéressons dans un premier temps, qu’à l’analyse  des attributs et des méthodes dans un code, cette analyse peut être appliquée à d’autres artifacts logiciels comme les diagrammes de classe et les spécifications des APIs.
+
+À leurs tours, les anti-patrons linguistiques sont répartis en trois sous-classes à détailler dans le paragraphe suivant pour les méthodes et les attributs \cite{palomba2015anti}:
+\begin{itemize}
+\item Does more than it says.
+\item Says More than it Does
+\item Does the Opposite
+\end{itemize}
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\subsection{Does more than it says}
+Ce sont les anti-patrons qui sont détectés lorsqu’il y a des actions plus que la signature d’une méthode proposée \cite{arnaoudova2013new}.
+
+\begin{enumerate}
+    
+
+\item \textbf{Plus que des getters} 
+\begin{itemize}
+\item Description: lorsqu’elles,les fonctions getters, fournissent plus que l’attribut concerné en mettant d’autres instructions.
+\item Appliqué aux: Méthodes
+\item Exemple: 
+\begin{framed}
+
+    {
+\fontfamily{qcr}\selectfont
+public ImageData getImageData() \{ \newline
+ Point size = getSize();\newline
+RGB black = new RGB(0, 0, 0);\newline
+RGB[] rgbs = new RGB[256];\newline
+rgbs[0] = black; // transparency\newline
+rgbs[1] = black; // black\newline
+PaletteData dataPalette = new PaletteData(rgbs);\newline
+imageData = new\newline
+ ImageData(size.x, size.y,8, dataPalette);\newline
+imageData.transparencyPixel = 0;\newline
+drawComposoteImage(size.x, size.y);\newline
+ for (int i = 0; i<rgbs.length; i++)\newline
+ If (rgbs[i]==null rgbs[i] =black ;\newline
+return imageData;\newline
+\}
+
+}
+\end{framed}
+\item Conséquences: l’utilisation de tels getters engendre l’allocation de nouveaux objets que les getters généralement n’allouent pas.
+\end{itemize}
+\item \textbf{plus qu’une méthode «is»}
+\begin{itemize}
+\item Description: Les méthodes qui commencent par “Is” qui sont supposées retourner un booléen mais elles retournent d’autres informations.
+\item Appliqué aux: Méthodes
+\item Exemple:
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+Public int isValid()\{
+final long currentTime=
+System.currentTimeMillis();
+if(currentTime<=this.expires){
+//The delay has not passed yet assuming source is valid.
+return SourceValidity.VALID;
+}
+\newline
+//The delay has passed,
+\newline
+//prepare for the next interval.
+this.expires=currentTime+this.delay;
+return this.delegate.isValid();
+\}
+}
+\end{framed}
+\item Conséquences: une erreur sera déclenchée au moment de la compilation sinon un malentendu de la part des développeurs qui feront la maintenance du programme risque de se produire.
+\end{itemize}
+
+\item \textbf{Setter avec retour}
+\begin{itemize}
+
+\item Description: Les méthodes setters servent à assigner une valeur à un attribut privé.\\
+Ces méthodes ne retournent rien normalement, elles commencent par «set», si un setter se trouve avec une valeur de retour, il doit être renomé.
+\item Appliqué aux: Méthodes
+\item Exemple: 
+\begin{framed}
+{\fontfamily{qcr}\selectfont
+
+Public Dimension setBreadth\newline
+(Dimension target, int source)\{\newline
+if(orientation == VERTICAL)\newline
+return new Dimension(source,\newline
+(int)target.getHeight());\newline
+else\newline
+return new Dimension(\newline
+(int)target. getWidth(), source);\newline
+\}
+}
+\end{framed}
+\item Conséquences: il se peut que la méthode setter retourne une valeur liée à un comportement inattendu donc l’erreur ne sera pas captée.
+
+\end{itemize}
+
+\item \textbf{Attendre mais ne pas recevoir une seule instance}
+\begin{itemize}
+\item Description: Quand le nom de la méthode fait l’intention de recevoir un seul objet et pas une collection.
+Soit une documentation doit être fournie ou bien la méthode doit être renommée.
+\item Appliqué aux: Méthodes.
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+//Returns the expansion state for a tree.\newline
+public List getExpansion()\{ return fExpansion; \}
+}
+\end{framed}
+\item Conséquences: ça ne va pas apparaître au moment de l’exécution mais ça peut causer des problèmes de codage pour le développeur, ce dernier va s’attendre à traiter un seul objet, mais il recevra une collection donc, il va être obligé à vérifier le corps de la méthode.
+
+\end{itemize}
+
+\end{enumerate}
+\subsection{Says More than it Does}
+Cet anti-patron apparaît lorsqu'une méthode fait moins que la signature d'une méthode propose\cite{arnaoudova2013new}.
+\begin{enumerate}
+    
+
+\item \textbf {Condition non implémentée}
+\begin{itemize}
+    \item Description: Quand les commentaires proposent un comportement conditionnel mais le code ne le contient pas.
+\item Appliqué aux: Méthodes
+\item Exemple:
+\begin{framed}
+{\fontfamily{qcr}\selectfont
+/∗Returns the children of this object.\newline
+∗When this object is displayed in a tree,\newline
+∗the returned objects will be this element’s\newline
+∗children.Returns an empty array if this\newline
+∗object has no children.\newline
+∗@param object The object to get the\newline
+∗children for.∗/\newline
+public Object[] getChildren(Object o)\newline
+\{return new Object[0]; \}
+}
+
+\end{framed}
+
+\item Conséquences: \\
+\begin{enumerate}
+    \item La contradiction entre la documentation et le comportement du code va pousser à croire qu’il y a une erreur.
+     \item Durant les tests en boite noire, le testeur va investir de son temps et effort pour préparer des cas de test selon les différentes conditions mentionnées dans la documentation alors qu’un seul cas pourrait suffir.
+
+\end{enumerate}
+
+\end{itemize}
+
+\item \textbf {Méthode de validation qui ne confirme pas}
+\begin{itemize}
+\item Description: Une méthode de validation ne retourne pas une valeur pour confirmer cette validation.
+\item Appliqué aux: Méthodes
+\item Exemple: 
+\begin{framed}
+
+
+{\fontfamily{qcr}\selectfont
+Public void checkCollision(String before, String after)\{ \newline
+boolean collision = (before != null 
+\newline
+&& before.equals(\_shortName))|| \newline
+(after != null && after.equals(\_shortName));\newline
+if(collision)\{\newline
+if(\_longName == null)\{\_longName = getLongName();\}\newline
+\_displayName = \_longName;\newline
+
+\}\newline
+\}
+}
+\end{framed}
+\item Conséquences: quelqu’un peut ne pas savoir comment utiliser la sortie de cette méthode, souvent cette sortie est stockée dans une variable quelque part et c’est pas clair au cas d’oubli pour le développeur ayant écrit cette méthode ou bien au cas de maintenance .
+\end{itemize}
+\item \textbf{Une méthode getter qui ne retourne rien}
+\begin{itemize}
+\item Description: le nom de la méthode fait s'attendre à une valeur de retour et ce n’est pas le cas.
+\item Appliqué aux: Méthodes.
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+Protected void getMethodBodies (CompilationUnitDeclaration unit, int place)\{ \newline
+//fillthemethodsbodiesinorder \newline
+//forthecodetobegenerated \newline
+if(unit.ignoreMethodBodies)\{\newline
+unit.ignoreFurtherInvestigation = true;\newline
+return;//if initial diet parse did not\newline
+//work, no need to dig into method bodies.\newline
+\}\newline
+if(place < parseThreshold)\newline
+return;//work already done...\newline
+//real parse of the method....\newline
+parser.scanner.setSourceBuffer(\newline
+unit.compilationResult.compilationUnit.getContents());\newline
+if(unit.types != null)\{\newline
+for(int i = unit.types.length; --i >= 0;)\newline
+unit.types[i].parseMethod(parser, unit);\newline
+\}\newline
+\}\newline
+}
+\end{framed}
+\item Conséquences: quelqu’un peut assigner la valeur de retour attendue par la méthode getter à une variable et puisque ce n’est pas possible, il va chercher à comprendre le code de la méthode pour trouver la valeur qu’elle devait retourner.
+\end{itemize}
+
+\item \textbf {Question sans réponse}
+\begin{itemize}
+\item Description: le nom de la méthode commence par «is» ce qui fait s'attendre à un booléen comme valeur retournée mais réellement la méthode ne retourne rien.
+\item Appliqué aux: Méthodes.
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+Public void isValid(
+Object[] selection, StatusInfores)\{
+//onlysingleselection
+if(selection.length == 1 && (selection[0] instanceof IFile))
+res.setOK();
+else res.setError(””);
+\}
+}
+\end{framed}
+\item Conséquences: Conséquences similaires à celles de “une méthode getter qui ne retourne rien". Dans ce cas, le développeur va s’attendre à ce qu’il peut utiliser la valeur de retour dans le contrôle d’une condition et ce n’est pas possible car elle ne retourne pas un booléen.
+\end{itemize}
+
+\item \textbf {Méthode de transformation sans retour}
+\begin{itemize}
+\item Description: le nom de la méthode donne l’impression qu’elle transforme un objet mais aucune valeur n’est retournée.
+\item Appliqué aux: Méthodes.
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+Public void javaToNative(
+Object object, TransferData transferData)\{
+byte[ ] check = TYPENAME.getBytes();
+super.javaToNative(check, transferData);
+\}
+}
+\end{framed}
+
+\item Conséquences: Similaire aux précédentes. Ici la valeur de retour pourrait être assignée à une variable dont le nom est inspiré du nom de la méthode.
+\end{itemize}
+
+\item \textbf{Attendre une collection mais ne pas la recevoir}
+\begin{itemize}
+\item Description: Un seul objet est retournée au lieu d’une collection.
+\item Appliqué aux: Méthodes.
+\item Exemple:
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+
+public boolean getStats( ) \{ return stats ; \}
+}
+\end{framed}
+\item Conséquences: un développeur peut s’attendre à une collection d’objet et donc il peut utiliser des patrons qui manipulent des collections comme iterator.
+\end{itemize}
+\end{enumerate}
+\subsection{Does the Opposite}
+Cet anti-patron apparaît dans le cas où il y a une relation d'opposition quelque part dans une méthode\cite{arnaoudova2013new}.
+\begin{enumerate}
+    
+
+\item \textbf {Le nom de la méthode et le type de retour sont opposés}
+\begin{itemize}
+\item Description: Ce que veut dire le nom de la méthode est contradictoire au type de la valeur retournée.
+\item Appliqué aux : méthodes.
+\item Exemple:
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+/∗Saves the current enable/disable state of \newline
+∗the given control and its descendents in the\newline
+∗returned object; the controls are all disabled.\newline
+∗@param w the control\newline
+∗@return an object capturing the enable/disable\newline
+∗state∗/\newline
+public static ControlEnableState disable(Control w)\{\newline
+return new ControlEnableState(w);\newline
+\}
+
+}
+\end{framed}
+\item Conséquences: les développeurs peuvent se tromper par rapport à la valeur retournée, ça peut ne pas avoir un impact si la méthode retourne un booléen.
+\end{itemize}
+
+\item \textbf {La signature de la méthode et les commentaires sont opposés}
+\begin{itemize}
+\item Description: La documentation de la méthode est contradictoire à sa déclaration(son nom ou bien le type retourné).
+
+\item Appliqué aux: Méthodes.
+\item Exemple:
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+
+/∗Returns true if this listener has a target
+∗for a back navigation. Only one listener
+∗needs to return true for the back button
+∗to be enabled.∗/
+public boolean isNavigateForwardEnabled()\{
+boolean enabled = false;
+if(\_isForwardEnabled == 1)\{enabled=true;\}
+else\{
+if(\_isForwardEnabled != 0)\{
+enabled = navigateForward(false) != null;
+\}
+\}
+return enabled;
+\}
+}
+\end{framed}
+\item Conséquences: similaires aux précédentes et peuvent être plus graves car le développeur sera confus, est ce qu’il doit suivre les commentaires ou bien la signature de la méthode, l’un des deux doit être mis à jour.
+\end{itemize}
+\end{enumerate}
+\subsection{Contains more that it says}
+Ce type d'anti-patron concerne les  attributs signifiont plus qu'ils sont réellement \cite{arnaoudova2013new}.
+\begin{enumerate}
+    
+
+\item \textbf {Contenir un objet au lieu d'une collection}
+\begin{itemize}
+\item Description: Un attribut dont le nom signifie qu’il contient une seule instance mais son type stoque une collection d’objets.
+\item Appliqué aux: Attributs.
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+Vector target ;
+}
+\end{framed}
+\item Conséquences: manque de compréhension de la classe, quand cet attribut change il est difficile de connaître l’impact du changement sur les objets manipulés.
+\end{itemize}
+
+\item \textbf {Nom de booléen mais le type non booléen}
+\begin{itemize}
+
+\item Description: Un attribut qui donne l’impression qu’il a deux valeurs soit vrai ou faux mais sa déclaration est de type  autre que booléen.
+\item Appliqué aux: Attributs.
+\item Exemple:  
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+ int[ ] isReached ;
+}
+\end{framed}
+\item Conséquence:Le développeur s’attend à ce qu’il soit capable d’utiliser cet attribut dans une instruction de condition mais le type déclaré ne le permet pas .
+
+\end{itemize}
+\end{enumerate}
+\subsection{Says more than it contains}
+Ce type d'anti-patron concerne les  attributs signifiont moins qu'ils sont réellement\cite{arnaoudova2013new}.
+\begin{enumerate}
+    
+\item \textbf {Dit beaucoup de choses mais contient une seule}
+\begin{itemize}
+\item Description: Un attribut qui donne l’impression du’il contient une collection d’objets mais en réalité il contient un seul objet.
+\item Appliqué aux: Attributs.
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+private static  boolean stats = true ;
+}
+\end{framed}
+\item Conséquences:manque de compréhension de l’impact du changement de l’attribut.
+\end{itemize}
+\end{enumerate}
+\subsection{Contains the opposite}
+Ce type d'anti-patron apparaît s'il y a une contradiction entre un attribut et les commentaires \cite{arnaoudova2013new}.
+\begin{enumerate}
+    
+
+\item \textbf{L’attribut et son type sont opposés}
+\begin{itemize}
+\item Appliqué aux: Attributs.
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+MAssociationEnd start = null ;
+}
+\end{framed}
+\item Conséquences: ça peut mener à des malentendus, par exemple
+un booléen contient l’information qui peut être directement utilisée dans une condition mais on risque d’inverser les blocs de si sinon.
+\end{itemize}
+\item \textbf{La signature de l’attribut et le commentaire sont opposés}
+\begin{itemize}
+\item Description: La documentation de l’attribut peut être contradictoire au nom ou type de cet attribut.
+\item Appliqué aux: Attributs
+\item Exemple: 
+\begin{framed}
+
+{\fontfamily{qcr}\selectfont
+//Configuration default exclude pattern \newline
+
+public final static String INCLUDE\_NAME\_DEFAULT
+=”.∗/@href=|.∗/@action=|frame/@src=”;
+
+}
+\end{framed}
+\tem Conséquences: sans analyser profondément le code source, le développeur peut ne pas comprendre le rôle de l’attribut.
+\end{itemize}
+
+\end{enumerate}
